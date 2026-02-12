@@ -70,7 +70,7 @@ docs/
 - workflow: `.github/workflows/deploy-pages.yml`
 - `vite` 的 `base` 由 `VITE_BASE_PATH` 注入。
 
-Demo 链接（部署后替换）：`https://<your-account>.github.io/<your-repo>/`
+Demo 链接：`https://emblemwu.github.io/vue-dashboard-schema/`
 
 ## Docs
 
