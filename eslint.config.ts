@@ -24,6 +24,17 @@ export default tseslint.config(
   },
   {
     files: ['**/*.{ts,tsx,vue}'],
+    languageOptions: {
+      globals: {
+        window: 'readonly',
+        document: 'readonly',
+        fetch: 'readonly',
+        HTMLElement: 'readonly',
+        ResizeObserver: 'readonly',
+        setInterval: 'readonly',
+        clearInterval: 'readonly'
+      }
+    },
     rules: {
       '@typescript-eslint/no-explicit-any': 'off',
       'vue/multi-word-component-names': 'off'

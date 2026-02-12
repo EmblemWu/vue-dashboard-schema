@@ -10,14 +10,16 @@
       @throttle-change="setThrottleMode"
     />
 
-    <div class="screen-page__viewport">
-      <div class="screen-page__scaler" :style="scalerStyle">
-        <EmptyState
-          v-if="!activeSchema"
-          title="无可用 Schema"
-          description="请检查 schemas 目录与 schema 格式。"
-        />
-        <SchemaRenderer v-else :schema="activeSchema" />
+    <div ref="viewportRef" class="screen-page__viewport">
+      <div class="screen-page__canvas" :style="canvasStyle">
+        <div class="screen-page__scaler" :style="scalerStyle">
+          <EmptyState
+            v-if="!activeSchema"
+            title="无可用 Schema"
+            description="请检查 schemas 目录与 schema 格式。"
+          />
+          <SchemaRenderer v-else :schema="activeSchema" />
+        </div>
       </div>
     </div>
 
@@ -31,7 +33,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import TopToolbar from '@/app/TopToolbar.vue'
 import { useScreenScale } from '@/lib/scale'
 import { SchemaRenderer } from '@/renderer/render'
@@ -39,7 +41,8 @@ import { useDashboardStore } from '@/store/dashboard'
 import EmptyState from '@/ui/EmptyState.vue'
 
 const store = useDashboardStore()
-const { baseWidth, baseHeight, scale } = useScreenScale()
+const viewportRef = ref<HTMLElement | null>(null)
+const { baseWidth, baseHeight, scale } = useScreenScale(viewportRef)
 
 const activeSchema = computed(() => store.activeSchema)
 const schemaKeys = computed(() => store.schemaKeys)
@@ -49,10 +52,16 @@ const schemaErrors = computed(() =>
   Object.entries(store.schemaErrorMap).map(([key, message]) => `${key}: ${message}`)
 )
 
+const canvasStyle = computed(() => ({
+  width: `${baseWidth * scale.value}px`,
+  height: `${baseHeight * scale.value}px`
+}))
+
 const scalerStyle = computed(() => ({
   width: `${baseWidth}px`,
   height: `${baseHeight}px`,
-  transform: `scale(${scale.value})`
+  transform: `scale(${scale.value})`,
+  transformOrigin: 'top left'
 }))
 
 const setSchema = (key: string) => store.setSchema(key)
@@ -81,8 +90,15 @@ onUnmounted(() => {
   place-items: center;
 }
 
+.screen-page__canvas {
+  position: relative;
+  overflow: hidden;
+}
+
 .screen-page__scaler {
-  transform-origin: center center;
+  position: absolute;
+  left: 0;
+  top: 0;
   overflow: hidden;
 }
 
