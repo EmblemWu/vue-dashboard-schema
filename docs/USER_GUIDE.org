@@ -1,0 +1,33 @@
+#+TITLE: Schema Dashboard User Guide
+
+* 项目目标
+通过 JSON Schema 配置大屏布局、组件和数据源，运行时自动渲染。
+
+* 本地运行
+#+begin_src bash
+pnpm install
+pnpm dev
+#+end_src
+
+* 验收命令
+#+begin_src bash
+pnpm lint
+pnpm typecheck
+pnpm test
+pnpm build
+#+end_src
+
+* 新增模板
+1. 在 =schemas/= 下新增 JSON 文件。
+2. 遵循 =docs/SCHEMA.md= 的字段定义。
+3. 刷新页面后在顶部模板选择器切换。
+
+* 新增 Widget
+1. 新建 =src/widgets/XXXWidget.vue=。
+2. 更新 =src/renderer/schema.ts= 和 =src/renderer/validate.ts=。
+3. 在 =src/renderer/render.ts= 注册映射。
+
+* 新增数据源
+1. 扩展 =DatasourceConfig= 类型。
+2. 扩展 zod 校验。
+3. 在 =src/renderer/datasources/index.ts= 添加执行逻辑。

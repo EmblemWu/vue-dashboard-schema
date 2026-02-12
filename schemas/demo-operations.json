@@ -1,0 +1,99 @@
+{
+  "version": "1.1",
+  "id": "demo-operations",
+  "title": "运营总览大屏",
+  "description": "Schema v1.1 - Grid Layout",
+  "layout": {
+    "mode": "grid",
+    "columns": 24,
+    "rowHeight": 74,
+    "gap": 12,
+    "baseWidth": 1920,
+    "baseHeight": 1080
+  },
+  "datasources": {
+    "dsKpi": {
+      "type": "mock",
+      "generator": "kpi-overview",
+      "intervalMs": 3000
+    },
+    "dsSales": {
+      "type": "mock",
+      "generator": "trend-sales",
+      "intervalMs": 3000
+    },
+    "dsPie": {
+      "type": "mock",
+      "generator": "traffic-channel",
+      "intervalMs": 5000
+    },
+    "dsTable": {
+      "type": "mock",
+      "generator": "region-rank",
+      "intervalMs": 4000
+    },
+    "dsSummary": {
+      "type": "mock",
+      "generator": "ops-summary",
+      "intervalMs": 6000
+    },
+    "dsBar": {
+      "type": "mock",
+      "generator": "bar-categories",
+      "intervalMs": 5000
+    }
+  },
+  "widgets": [
+    {
+      "id": "w-summary",
+      "type": "text",
+      "title": "运营摘要",
+      "datasource": "dsSummary",
+      "position": { "x": 0, "y": 0, "w": 8, "h": 3 },
+      "props": {
+        "text": "运营状态",
+        "subText": "今日稳定运行"
+      }
+    },
+    {
+      "id": "w-users",
+      "type": "number-card",
+      "title": "用户规模",
+      "datasource": "dsKpi",
+      "refreshIntervalMs": 2000,
+      "position": { "x": 8, "y": 0, "w": 8, "h": 3 },
+      "props": {
+        "label": "总用户"
+      }
+    },
+    {
+      "id": "w-bar",
+      "type": "bar",
+      "title": "类别业绩",
+      "datasource": "dsBar",
+      "position": { "x": 16, "y": 0, "w": 8, "h": 3 }
+    },
+    {
+      "id": "w-line",
+      "type": "line",
+      "title": "销售趋势",
+      "datasource": "dsSales",
+      "refreshIntervalMs": 1000,
+      "position": { "x": 0, "y": 3, "w": 14, "h": 5 }
+    },
+    {
+      "id": "w-pie",
+      "type": "pie",
+      "title": "流量构成",
+      "datasource": "dsPie",
+      "position": { "x": 14, "y": 3, "w": 10, "h": 5 }
+    },
+    {
+      "id": "w-table",
+      "type": "table",
+      "title": "区域排行",
+      "datasource": "dsTable",
+      "position": { "x": 0, "y": 8, "w": 24, "h": 4 }
+    }
+  ]
+}

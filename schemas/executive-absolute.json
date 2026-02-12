@@ -1,0 +1,91 @@
+{
+  "version": "1.0",
+  "id": "executive-absolute",
+  "title": "管理驾驶舱",
+  "description": "Schema v1.0 - Absolute Layout",
+  "layout": {
+    "mode": "absolute",
+    "baseWidth": 1920,
+    "baseHeight": 1080,
+    "gap": 12
+  },
+  "datasources": {
+    "dsSummary": {
+      "type": "mock",
+      "generator": "ops-summary",
+      "intervalMs": 4000
+    },
+    "dsKpi": {
+      "type": "mock",
+      "generator": "kpi-overview",
+      "intervalMs": 2500
+    },
+    "dsSales": {
+      "type": "mock",
+      "generator": "trend-sales",
+      "intervalMs": 3500
+    },
+    "dsBar": {
+      "type": "mock",
+      "generator": "bar-categories",
+      "intervalMs": 5000
+    },
+    "dsPie": {
+      "type": "mock",
+      "generator": "traffic-channel",
+      "intervalMs": 4500
+    },
+    "dsTable": {
+      "type": "mock",
+      "generator": "region-rank",
+      "intervalMs": 5500
+    }
+  },
+  "widgets": [
+    {
+      "id": "tx-1",
+      "type": "text",
+      "title": "全局状态",
+      "datasource": "dsSummary",
+      "position": { "x": 20, "y": 20, "w": 520, "h": 220 }
+    },
+    {
+      "id": "num-1",
+      "type": "number-card",
+      "title": "用户健康度",
+      "datasource": "dsKpi",
+      "position": { "x": 560, "y": 20, "w": 420, "h": 220 },
+      "props": {
+        "label": "活跃用户"
+      }
+    },
+    {
+      "id": "bar-1",
+      "type": "bar",
+      "title": "渠道贡献",
+      "datasource": "dsBar",
+      "position": { "x": 1000, "y": 20, "w": 900, "h": 220 }
+    },
+    {
+      "id": "line-1",
+      "type": "line",
+      "title": "销售波动",
+      "datasource": "dsSales",
+      "position": { "x": 20, "y": 260, "w": 1220, "h": 500 }
+    },
+    {
+      "id": "pie-1",
+      "type": "pie",
+      "title": "流量比例",
+      "datasource": "dsPie",
+      "position": { "x": 1260, "y": 260, "w": 640, "h": 500 }
+    },
+    {
+      "id": "table-1",
+      "type": "table",
+      "title": "区域明细",
+      "datasource": "dsTable",
+      "position": { "x": 20, "y": 780, "w": 1880, "h": 280 }
+    }
+  ]
+}
