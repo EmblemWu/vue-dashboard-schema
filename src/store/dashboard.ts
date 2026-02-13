@@ -7,7 +7,11 @@ import {
 } from '@/renderer/datasources'
 import type { DashboardSchema } from '@/renderer/schema'
 import { dashboardScheduler } from '@/renderer/scheduler'
-import { validateDashboardSchema } from '@/renderer/validate'
+import {
+  loadTemplateByKey,
+  loadTemplateCatalog,
+  type TemplateCatalogItem
+} from '@/features/templates/schema-repository'
 
 export type ThrottleMode = 'normal' | 'x5' | 'x10'
 
@@ -17,40 +21,20 @@ const throttleMap: Record<ThrottleMode, number> = {
   x10: 10
 }
 
-const schemaModules = import.meta.glob('/schemas/*.json', {
-  eager: true,
-  import: 'default'
-}) as Record<string, unknown>
-
-const normalizeKey = (path: string) => path.split('/').pop()?.replace('.json', '') ?? path
-
 export const useDashboardStore = defineStore('dashboard', () => {
-  const schemaMap = ref<Record<string, DashboardSchema>>({})
+  const catalog = ref<TemplateCatalogItem[]>([])
   const schemaErrorMap = ref<Record<string, string>>({})
+  const catalogLoading = ref(false)
+  const catalogError = ref<string | null>(null)
+
   const currentSchemaKey = ref<string>('')
+  const activeSchema = ref<DashboardSchema | null>(null)
+  const schemaLoading = ref(false)
+  const schemaError = ref<string | null>(null)
+
   const throttleMode = ref<ThrottleMode>('normal')
 
-  Object.entries(schemaModules).forEach(([path, value]) => {
-    const key = normalizeKey(path)
-    const result = validateDashboardSchema(value)
-    if (!result.ok) {
-      schemaErrorMap.value[key] = result.error ?? 'invalid schema'
-      return
-    }
-    schemaMap.value[key] = result.schema
-  })
-
-  const schemaKeys = computed(() => Object.keys(schemaMap.value))
-
-  if (!currentSchemaKey.value && schemaKeys.value.length > 0) {
-    const firstKey = schemaKeys.value[0]
-    if (firstKey) {
-      currentSchemaKey.value = firstKey
-    }
-  }
-
-  const activeSchema = computed(() => schemaMap.value[currentSchemaKey.value])
-
+  const schemaKeys = computed(() => catalog.value.map((item) => item.key))
   const schedulerFactor = computed(() => throttleMap[throttleMode.value])
 
   const collectWidgetIntervals = (schema: DashboardSchema) => {
@@ -70,14 +54,13 @@ export const useDashboardStore = defineStore('dashboard', () => {
     return intervals
   }
 
-  const applySchema = (schema: DashboardSchema | undefined) => {
+  const applySchema = (schema: DashboardSchema | null) => {
     if (!schema) {
       resetDatasourceRuntime()
       return
     }
 
-    const intervals = collectWidgetIntervals(schema)
-    configureDatasourceRuntime(schema, intervals)
+    configureDatasourceRuntime(schema, collectWidgetIntervals(schema))
   }
 
   watch(
@@ -86,14 +69,51 @@ export const useDashboardStore = defineStore('dashboard', () => {
       applySchema(schema)
       dashboardScheduler.setThrottleFactor(factor)
     },
-    {
-      immediate: true
-    }
+    { immediate: true }
   )
 
-  const setSchema = (key: string) => {
-    if (schemaMap.value[key]) {
-      currentSchemaKey.value = key
+  const loadCatalog = async () => {
+    if (catalogLoading.value) {
+      return
+    }
+
+    catalogLoading.value = true
+    catalogError.value = null
+    try {
+      const result = await loadTemplateCatalog()
+      catalog.value = result.catalog
+      schemaErrorMap.value = result.invalid
+      if (!currentSchemaKey.value && result.catalog.length > 0) {
+        const first = result.catalog[0]
+        if (first) {
+          currentSchemaKey.value = first.key
+        }
+      }
+    } catch (error) {
+      catalogError.value = error instanceof Error ? error.message : '模板列表加载失败'
+    } finally {
+      catalogLoading.value = false
+    }
+  }
+
+  const loadSchema = async (key: string) => {
+    schemaLoading.value = true
+    schemaError.value = null
+    currentSchemaKey.value = key
+
+    try {
+      const schema = await loadTemplateByKey(key)
+      if (!schema) {
+        activeSchema.value = null
+        schemaError.value = `模板不存在: ${key}`
+        return
+      }
+      activeSchema.value = schema
+    } catch (error) {
+      activeSchema.value = null
+      schemaError.value = error instanceof Error ? error.message : '模板加载失败'
+    } finally {
+      schemaLoading.value = false
     }
   }
 
@@ -110,14 +130,19 @@ export const useDashboardStore = defineStore('dashboard', () => {
   }
 
   return {
-    schemaMap,
+    catalog,
     schemaErrorMap,
+    catalogLoading,
+    catalogError,
     currentSchemaKey,
-    schemaKeys,
     activeSchema,
+    schemaLoading,
+    schemaError,
+    schemaKeys,
     datasourceStore,
     throttleMode,
-    setSchema,
+    loadCatalog,
+    loadSchema,
     setThrottleMode,
     startRuntime,
     stopRuntime

@@ -1,7 +1,14 @@
 #+TITLE: Schema Dashboard User Guide
 
-* 项目目标
-通过 JSON Schema 配置大屏布局、组件和数据源，运行时自动渲染。
+* 页面说明
+- /#/templates: 模板列表（可收藏、可进入详情/大屏）
+- /#/templates/:schemaKey: 模板详情（查看组件清单）
+- /#/favorites: 收藏管理
+- /#/screen/:schemaKey: 大屏渲染页
+
+* 两条可跑通路径
+1. 模板列表 -> 模板详情 -> 打开大屏
+2. 模板列表收藏 -> 收藏管理 -> 打开大屏
 
 * 本地运行
 #+begin_src bash
@@ -9,25 +16,21 @@ pnpm install
 pnpm dev
 #+end_src
 
-* 验收命令
+* 质量门
 #+begin_src bash
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm test:e2e
 #+end_src
 
 * 新增模板
-1. 在 =schemas/= 下新增 JSON 文件。
-2. 遵循 =docs/SCHEMA.md= 的字段定义。
-3. 刷新页面后在顶部模板选择器切换。
+1. 在 =schemas/= 添加 JSON 文件
+2. 按 =docs/SCHEMA.md= 定义字段
+3. 在模板列表查看是否加载成功
 
-* 新增 Widget
-1. 新建 =src/widgets/XXXWidget.vue=。
-2. 更新 =src/renderer/schema.ts= 和 =src/renderer/validate.ts=。
-3. 在 =src/renderer/render.ts= 注册映射。
-
-* 新增数据源
-1. 扩展 =DatasourceConfig= 类型。
-2. 扩展 zod 校验。
-3. 在 =src/renderer/datasources/index.ts= 添加执行逻辑。
+* 异常与兜底
+- 页面级：加载态/空态/错误态/重试
+- 全局：ErrorBoundary 捕获运行时异常
+- 图表资源失败时降级显示提示文案

@@ -13,6 +13,10 @@ const router = createRouter({
   routes
 })
 
+app.config.errorHandler = (error, _instance, info) => {
+  console.error('[GlobalError]', info, error)
+}
+
 app.use(pinia)
 app.use(router)
 app.mount('#app')

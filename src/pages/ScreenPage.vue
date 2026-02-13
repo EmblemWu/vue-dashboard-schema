@@ -6,12 +6,21 @@
       :schema-key="currentSchemaKey"
       :schema-keys="schemaKeys"
       :throttle-mode="throttleMode"
-      @schema-change="setSchema"
+      @schema-change="goToSchema"
       @throttle-change="setThrottleMode"
     />
 
     <div ref="viewportRef" class="screen-page__viewport">
-      <div class="screen-page__canvas" :style="canvasStyle">
+      <LoadingState v-if="schemaLoading" title="加载大屏中..." description="正在准备模板和数据源" />
+
+      <ErrorState
+        v-else-if="schemaError"
+        title="大屏加载失败"
+        :description="schemaError"
+        :on-retry="loadSchema"
+      />
+
+      <div v-else class="screen-page__canvas" :style="canvasStyle">
         <div class="screen-page__scaler" :style="scalerStyle">
           <EmptyState
             v-if="!activeSchema"
@@ -33,13 +42,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted, onUnmounted, ref } from 'vue'
+import { computed, onMounted, onUnmounted, ref, watch } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import TopToolbar from '@/app/TopToolbar.vue'
 import { useScreenScale } from '@/lib/scale'
 import { SchemaRenderer } from '@/renderer/render'
 import { useDashboardStore } from '@/store/dashboard'
 import EmptyState from '@/ui/EmptyState.vue'
+import ErrorState from '@/ui/ErrorState.vue'
+import LoadingState from '@/ui/LoadingState.vue'
 
+const route = useRoute()
+const router = useRouter()
 const store = useDashboardStore()
 const viewportRef = ref<HTMLElement | null>(null)
 const { baseWidth, baseHeight, scale } = useScreenScale(viewportRef)
@@ -48,6 +62,8 @@ const activeSchema = computed(() => store.activeSchema)
 const schemaKeys = computed(() => store.schemaKeys)
 const currentSchemaKey = computed(() => store.currentSchemaKey)
 const throttleMode = computed(() => store.throttleMode)
+const schemaLoading = computed(() => store.schemaLoading)
+const schemaError = computed(() => store.schemaError)
 const schemaErrors = computed(() =>
   Object.entries(store.schemaErrorMap).map(([key, message]) => `${key}: ${message}`)
 )
@@ -64,11 +80,35 @@ const scalerStyle = computed(() => ({
   transformOrigin: 'top left'
 }))
 
-const setSchema = (key: string) => store.setSchema(key)
+const routeSchemaKey = computed(() => String(route.params.schemaKey || ''))
+
+const loadSchema = async () => {
+  await store.loadCatalog()
+  if (!routeSchemaKey.value) {
+    if (store.schemaKeys.length > 0) {
+      await router.replace(`/screen/${store.schemaKeys[0]}`)
+    }
+    return
+  }
+  await store.loadSchema(routeSchemaKey.value)
+}
+
+const goToSchema = (key: string) => {
+  void router.push(`/screen/${key}`)
+}
+
 const setThrottleMode = (mode: 'normal' | 'x5' | 'x10') => store.setThrottleMode(mode)
+
+watch(
+  () => routeSchemaKey.value,
+  () => {
+    void loadSchema()
+  }
+)
 
 onMounted(() => {
   store.startRuntime()
+  void loadSchema()
 })
 
 onUnmounted(() => {

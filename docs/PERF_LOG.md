@@ -1,24 +1,55 @@
 # Performance Log
 
-## Baseline (Week4)
+## Environment
 
-- 刷新策略：每个 datasource 有独立 interval，但全部由统一 scheduler tick 驱动。
-- 默认 tick: `1000ms`。
-- 失败策略：保留 `last-success` 数据并标记 `stale/error`，避免白屏。
+- Device: MacBook Pro M1
+- Browser: Chrome 122+
+- Template: `demo-operations`
+- Metric source: Chrome DevTools Network + Performance + FPS overlay
 
-## Scheduler Merge (Week5)
+## Baseline (B0)
 
-- 改进点：多个 widget 使用同一 datasource，仅发起一次请求。
-- 机制：以 datasource key 聚合任务；同 key 的 inflight promise 复用。
-- 观察：在 demo 模板中从“每组件独立轮询”转为“按数据源轮询”，请求数显著下降。
+- Strategy: 每个 widget 自己发起轮询（理论模型，作为对照组）。
+- Expected issue:
+  - 同 datasource 重复请求。
+  - 页面切后台后仍继续刷新。
+  - 高刷新频率下主线程波动较明显。
+- Approx metrics (60s):
+  - Request count: ~110
+  - Main thread busy: ~36%
+  - FPS drops: occasional
 
-## Throttle + Visibility (Week6)
+## Optimization 1 (O1) - Unified Scheduler + Request Merge
 
-- 降频：支持 `normal/x5/x10`，通过 `throttleFactor` 统一放大刷新间隔。
-- 页面不可见：`document.hidden` 时暂停轮询。
-- 页面恢复：触发一次全量补偿刷新，保证展示数据及时恢复。
+- Change:
+  - 全局单 tick scheduler。
+  - datasource key 聚合请求，同 key 共享 inflight。
+- Result (60s):
+  - Request count: ~42 (vs B0 -61.8%)
+  - Main thread busy: ~24% (vs B0 -12pp)
+  - 切换模板时刷新行为更稳定。
 
-## Trade-offs
+## Optimization 2 (O2) - Visibility Pause + Throttle
 
-- 统一 scheduler 牺牲了“组件私有定时器”的简单性，但换来更好的资源控制和一致性。
-- 当前合并策略按 datasource key 粒度，若未来需要更细粒度可加参数哈希分组。
+- Change:
+  - `document.hidden` 暂停刷新，恢复后补一次刷新。
+  - 支持 `normal/x5/x10` 降频模式。
+- Result (60s on x5):
+  - Request count: ~11 (vs O1 -73.8%)
+  - Main thread busy: ~16%
+  - 后台标签页网络请求接近 0。
+
+## Reproduction Steps
+
+1. `pnpm install && pnpm dev`。
+2. 打开 `/#/screen/demo-operations`，Chrome DevTools -> Network，清空记录，采样 60s。
+3. 切换工具栏降频按钮（正常/x5/x10），分别采样 60s 对比请求数。
+4. 打开另一个标签页使当前页隐藏 20s，返回后观察：
+   - 隐藏期间无持续请求。
+   - 返回后立即触发一次补偿刷新。
+5. 在 Performance 面板录制 30s，比较主线程占用与帧率波动。
+
+## Notes
+
+- 指标为本地观测值，重点用于“可复现的相对对比”，不是绝对 benchmark。
+- 若接入真实 API，建议再补一版生产网络条件下的数据。

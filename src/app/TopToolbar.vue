@@ -6,6 +6,8 @@
     </div>
 
     <div class="top-toolbar__actions">
+      <RouterLink to="/templates">模板列表</RouterLink>
+      <RouterLink to="/favorites">收藏管理</RouterLink>
       <label>
         模板
         <select
@@ -31,6 +33,7 @@
 </template>
 
 <script setup lang="ts">
+import { RouterLink } from 'vue-router'
 import Button from '@/ui/Button.vue'
 import type { ThrottleMode } from '@/store/dashboard'
 
@@ -79,6 +82,11 @@ defineEmits<{
   display: flex;
   align-items: center;
   gap: 14px;
+}
+
+.top-toolbar__actions > a {
+  color: #8fe6ff;
+  text-decoration: none;
 }
 
 .top-toolbar__actions label {

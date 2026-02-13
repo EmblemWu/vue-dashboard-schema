@@ -1,80 +1,98 @@
 # Schema Dashboard Renderer (Vue3 + TS)
 
-面向运营/管理者的大屏看板渲染器：通过 JSON Schema 定义布局、组件和数据源，动态渲染可配置看板。
+面向运营/管理者的大屏看板渲染器：通过 JSON Schema 描述布局、组件和数据源，运行时动态渲染，支持模板管理、收藏管理、统一刷新调度与失败兜底。
 
-## Features
+## Demo
 
-- Schema 驱动渲染：`schemas/*.json` -> 页面
-- 组件库（6类）：Text / NumberCard / Line / Bar / Pie / Table
+- Online: `https://emblemwu.github.io/vue-dashboard-schema/`
+
+## Product Positioning
+
+- 目标用户：运营、管理者、分析人员。
+- 核心价值：低代码配置大屏模板，不改前端代码即可切换展示。
+- 交付目标：在“稳定展示 + 性能可控 + 异常可恢复”之间取得平衡。
+
+## Core Features
+
+- Schema 驱动渲染（`schemas/*.json`）
+- 6 类 widgets：Text / NumberCard / Line / Bar / Pie / Table
 - 数据源：mock + http polling
-- 刷新调度：统一 scheduler、可见性暂停/恢复、全局降频
-- 失败兜底：保留 last-success 数据并标记 stale/error
-- 1920x1080 等比缩放适配
-- CI：lint/typecheck/test/build
-- 部署：GitHub Pages（workflow 已提供）
+- 刷新策略：统一 scheduler、请求合并、可见性暂停、恢复补偿、全局降频
+- 兜底策略：last-success + stale/error 标记，图表资源失败降级
+- 页面闭环：模板列表 / 模板详情 / 收藏管理 / 大屏页
 
-## Quick Start
+## User Flows
+
+1. 路径 A：模板列表 -> 模板详情 -> 打开大屏
+2. 路径 B：模板列表收藏 -> 收藏管理 -> 打开大屏
+
+## Architecture
+
+```text
+src/
+  app/        # 应用入口、路由、全局错误边界
+  pages/      # 路由页面
+  features/   # 业务能力（templates/favorites）
+  renderer/   # schema 类型、校验、渲染、数据源、调度器
+  widgets/    # 可视化组件
+  ui/         # 通用 UI 状态组件
+  lib/        # 通用工具
+  store/      # 全局 dashboard 状态
+```
+
+## Key Trade-offs
+
+- 选择“统一 scheduler”而不是组件各自 interval：实现复杂度更高，但请求控制更稳定。
+- 选择运行时 zod 校验：牺牲少量初始化开销，换来模板错误可诊断且不崩溃。
+- 选择 hash 路由 + Pages 部署：配置简单，适合静态托管场景。
+
+## Known Limitations
+
+- e2e 当前覆盖核心路径 1 条，复杂异常链路仍可继续补。
+- ECharts 体积较大，构建产物存在大 chunk 警告。
+- HTTP datasource 仅支持基础 GET/POST；鉴权、签名、重放策略尚未内建。
+
+## Local Development
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Validation Commands
+## Quality Gates
 
 ```bash
 pnpm lint
 pnpm typecheck
 pnpm test
 pnpm build
+pnpm test:e2e
 ```
 
-## Project Structure
+## CI / Deployment
 
-```text
-src/
-  app/
-  pages/
-  renderer/
-    schema.ts
-    validate.ts
-    render.ts
-    datasources/
-    scheduler/
-  widgets/
-  ui/
-  store/
-  lib/
-schemas/
-docs/
-```
+- CI: `.github/workflows/ci.yml`（lint/typecheck/test/build/e2e）
+- Deploy: `.github/workflows/deploy-pages.yml`（GitHub Pages）
 
-## How To Add A Widget
+## Extensibility
 
-1. 在 `src/widgets/` 新增组件文件（例如 `GaugeWidget.vue`）。
-2. 更新 `src/renderer/schema.ts` 的 `WidgetType` 联合类型。
-3. 更新 `src/renderer/validate.ts` 的 zod `type` 枚举。
-4. 在 `src/renderer/render.ts` 的 `widgetMap` 注册新组件。
-5. 在 schema 文件中添加 widget 配置并验证渲染。
+### Add Widget
 
-## How To Add A Datasource
+1. 在 `src/widgets/` 新建组件。
+2. 更新 `src/renderer/schema.ts` 的 `WidgetType`。
+3. 更新 `src/renderer/validate.ts` 的 zod 枚举。
+4. 在 `src/renderer/render.ts` 注册组件映射。
 
-1. 在 `src/renderer/schema.ts` 扩展 datasource 类型定义。
-2. 在 `src/renderer/validate.ts` 扩展 zod 校验。
-3. 在 `src/renderer/datasources/index.ts` 的 `loadSource` 中添加处理逻辑。
-4. 在 schema 中配置新 datasource，并在 widget 里通过 `datasource` 绑定。
+### Add Datasource
 
-## Deployment (GitHub Pages)
-
-- CI 构建后上传 `dist` 到 GitHub Pages。
-- workflow: `.github/workflows/deploy-pages.yml`
-- `vite` 的 `base` 由 `VITE_BASE_PATH` 注入。
-
-Demo 链接：`https://emblemwu.github.io/vue-dashboard-schema/`
+1. 扩展 `src/renderer/schema.ts` 数据源类型。
+2. 扩展 `src/renderer/validate.ts` 校验。
+3. 在 `src/renderer/datasources/index.ts` 添加执行逻辑。
+4. 在 schema 里绑定 datasource key。
 
 ## Docs
 
-- 里程碑：`docs/TODO.md`
-- Schema 规范：`docs/SCHEMA.md`
-- 性能记录：`docs/PERF_LOG.md`
-- 使用说明（org）：`docs/USER_GUIDE.org`
+- TODO: `docs/TODO.md`
+- Schema: `docs/SCHEMA.md`
+- Perf: `docs/PERF_LOG.md`
+- User Guide (org): `docs/USER_GUIDE.org`
