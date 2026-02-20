@@ -16,6 +16,7 @@
 - 商品管理（真实 API）
 - 订单管理（真实 API，含发货流程）
 - 用户管理（真实 API）
+- 管理员管理（真实 API，含重置密码）
 - 优惠券管理（真实 API）
 - 公告管理（真实 API）
 - 系统设置管理（真实 API）
@@ -71,6 +72,7 @@ pnpm test:e2e
 - `/#/app/products`
 - `/#/app/orders`
 - `/#/app/users`
+- `/#/app/managers`
 - `/#/app/coupons`
 - `/#/app/notices`
 - `/#/app/settings`
@@ -80,6 +82,7 @@ pnpm test:e2e
 
 - `POST /api/auth/login`
 - `GET /api/auth/me`
+- `GET /api/auth/managers/`
 - `GET /api/dashboard/overview`
 - `GET /api/catalog/categories`
 - `GET /api/catalog/products`

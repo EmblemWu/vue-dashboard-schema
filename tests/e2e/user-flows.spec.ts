@@ -19,6 +19,10 @@ test('mall admin flow: login -> overview -> core modules', async ({ page }) => {
   await page.goto('/#/app/users')
   await expect(page.getByText('用户管理')).toBeVisible()
 
+  await page.goto('/#/app/managers')
+  await expect(page.getByText('管理员管理')).toBeVisible()
+  await expect(page.getByText('ops_admin')).toBeVisible()
+
   await page.goto('/#/app/coupons')
   await expect(page.getByText('营销管理（优惠券）')).toBeVisible()
 

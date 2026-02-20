@@ -127,6 +127,26 @@ export interface SiteSettingPayload {
   description: string
 }
 
+export interface Manager {
+  id: number
+  username: string
+  email: string
+  is_staff: boolean
+  is_superuser: boolean
+  is_active: boolean
+  last_login: string | null
+  date_joined: string
+}
+
+export interface ManagerPayload {
+  username: string
+  email: string
+  password?: string
+  is_staff: boolean
+  is_superuser: boolean
+  is_active: boolean
+}
+
 export interface OverviewStats {
   product_count: number
   on_sale_count: number
@@ -240,5 +260,27 @@ export const fetchSettingsApi = async () => {
 
 export const updateSettingApi = async (id: number, payload: SiteSettingPayload) => {
   const { data } = await http.put<SiteSetting>(`/common/settings/${id}/`, payload)
+  return data
+}
+
+export const fetchManagersApi = async () => {
+  const { data } = await http.get<Manager[]>('/auth/managers/')
+  return data
+}
+
+export const createManagerApi = async (payload: ManagerPayload) => {
+  const { data } = await http.post<Manager>('/auth/managers/', payload)
+  return data
+}
+
+export const updateManagerApi = async (id: number, payload: ManagerPayload) => {
+  const { data } = await http.put<Manager>(`/auth/managers/${id}/`, payload)
+  return data
+}
+
+export const resetManagerPasswordApi = async (id: number, password: string) => {
+  const { data } = await http.post<{ detail: string }>(`/auth/managers/${id}/reset_password/`, {
+    password
+  })
   return data
 }

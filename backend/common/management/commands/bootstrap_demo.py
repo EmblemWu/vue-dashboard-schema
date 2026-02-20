@@ -21,6 +21,25 @@ class Command(BaseCommand):
             User.objects.create_superuser(username='admin', password='admin123', email='admin@example.com')
             self.stdout.write(self.style.SUCCESS('Created admin user: admin / admin123'))
 
+        manager_seed = [
+            ('ops_admin', 'ops@example.com'),
+            ('marketing_admin', 'marketing@example.com')
+        ]
+        for username, email in manager_seed:
+            User.objects.get_or_create(
+                username=username,
+                defaults={
+                    'email': email,
+                    'is_staff': True,
+                    'is_superuser': False,
+                    'is_active': True
+                }
+            )
+        for username in ['ops_admin', 'marketing_admin']:
+            user = User.objects.get(username=username)
+            user.set_password('admin123')
+            user.save(update_fields=['password'])
+
         categories = [
             ('数码配件', 1),
             ('服饰箱包', 2),
