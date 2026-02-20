@@ -6,66 +6,50 @@ export const routes: RouteRecordRaw[] = [
     redirect: '/app/overview'
   },
   {
+    path: '/login',
+    name: 'login',
+    component: () => import('@/pages/LoginPage.vue')
+  },
+  {
     path: '/app',
     component: () => import('@/app/layout/AppShell.vue'),
+    meta: { requiresAuth: true },
     children: [
-      {
-        path: '',
-        redirect: '/app/overview'
-      },
+      { path: '', redirect: '/app/overview' },
       {
         path: 'overview',
         name: 'overview',
         component: () => import('@/pages/admin/OverviewPage.vue')
       },
       {
-        path: 'dashboards',
-        name: 'dashboards',
-        component: () => import('@/pages/admin/DashboardCenterPage.vue')
+        path: 'categories',
+        name: 'categories',
+        component: () => import('@/pages/admin/CategoriesPage.vue')
       },
       {
-        path: 'dashboards/:schemaKey',
-        name: 'dashboard-detail',
-        component: () => import('@/pages/admin/DashboardDetailPage.vue')
+        path: 'products',
+        name: 'products',
+        component: () => import('@/pages/admin/ProductsPage.vue')
+      },
+      { path: 'orders', name: 'orders', component: () => import('@/pages/admin/OrdersPage.vue') },
+      { path: 'users', name: 'users', component: () => import('@/pages/admin/UsersPage.vue') },
+      {
+        path: 'coupons',
+        name: 'coupons',
+        component: () => import('@/pages/admin/CouponsPage.vue')
       },
       {
-        path: 'analysis',
-        name: 'analysis',
-        component: () => import('@/pages/admin/AnalysisPage.vue')
-      },
-      {
-        path: 'datasources',
-        name: 'datasources',
-        component: () => import('@/pages/admin/DatasourcesPage.vue')
-      },
-      {
-        path: 'alerts',
-        name: 'alerts',
-        component: () => import('@/pages/admin/AlertsPage.vue')
-      },
-      {
-        path: 'favorites',
-        name: 'favorites',
-        component: () => import('@/pages/admin/FavoritesAdminPage.vue')
+        path: 'settings',
+        name: 'settings',
+        component: () => import('@/pages/admin/SettingsPage.vue')
       }
     ]
   },
   {
     path: '/screen/:schemaKey',
     name: 'screen',
+    meta: { requiresAuth: true },
     component: () => import('@/pages/ScreenPage.vue')
-  },
-  {
-    path: '/templates',
-    redirect: '/app/dashboards'
-  },
-  {
-    path: '/templates/:schemaKey',
-    redirect: (to) => `/app/dashboards/${String(to.params.schemaKey ?? '')}`
-  },
-  {
-    path: '/favorites',
-    redirect: '/app/favorites'
   },
   {
     path: '/:pathMatch(.*)*',

@@ -18,7 +18,9 @@
         </div>
         <div class="app-shell__actions">
           <el-tag type="success">Online</el-tag>
-          <el-avatar size="small">EW</el-avatar>
+          <el-text size="small">{{ auth.user?.username ?? 'guest' }}</el-text>
+          <el-avatar size="small">{{ initials }}</el-avatar>
+          <el-button text type="danger" @click="logout">退出</el-button>
         </div>
       </el-header>
 
@@ -31,10 +33,13 @@
 
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useRoute } from 'vue-router'
+import { useRoute, useRouter } from 'vue-router'
 import { NAV_ITEMS } from '@/app/config/navigation'
+import { useAuthStore } from '@/store/auth'
 
 const route = useRoute()
+const router = useRouter()
+const auth = useAuthStore()
 
 const activePath = computed(() => {
   if (route.path.startsWith('/app/dashboards/')) {
@@ -45,7 +50,13 @@ const activePath = computed(() => {
 
 const current = computed(() => NAV_ITEMS.find((item) => item.path === activePath.value))
 const title = computed(() => current.value?.label ?? 'Insight Admin')
-const subtitle = computed(() => '通用业务分析后台')
+const subtitle = computed(() => '商城运营后台')
+const initials = computed(() => (auth.user?.username?.slice(0, 2) ?? 'GU').toUpperCase())
+
+const logout = () => {
+  auth.logout()
+  void router.push('/login')
+}
 </script>
 
 <style scoped>

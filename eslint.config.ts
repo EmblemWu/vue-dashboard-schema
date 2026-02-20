@@ -6,7 +6,16 @@ import vueParser from 'vue-eslint-parser'
 
 export default tseslint.config(
   {
-    ignores: ['dist', 'coverage', '.husky', 'node_modules']
+    ignores: [
+      'dist',
+      'coverage',
+      '.husky',
+      'node_modules',
+      '.venv',
+      'backend',
+      '完整代码',
+      '后端api源码【仅供参考】'
+    ]
   },
   js.configs.recommended,
   ...tseslint.configs.recommended,

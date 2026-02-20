@@ -8,11 +8,15 @@ pnpm-debug.log*
 lerna-debug.log*
 
 node_modules
+.venv
 dist
 dist-ssr
 *.local
 playwright-report
 test-results
+backend/db.sqlite3
+backend/**/__pycache__
+backend/**/*.pyc
 
 # Editor directories and files
 .vscode/*

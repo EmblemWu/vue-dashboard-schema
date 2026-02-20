@@ -1,58 +1,57 @@
-# Insight Admin (Vue3 + ECharts + Element Plus)
+# Mall Admin (Vue3 + Element Plus + ECharts + Django)
 
-一个通用业务分析后台：支持运营概览、看板模板中心、指标分析、数据源管理、告警中心与大屏预览。
-
-## Demo
-
-- https://emblemwu.github.io/vue-dashboard-schema/
-
-## Product Positioning
-
-- 从单页大屏升级为可交付后台系统（BI-lite + 运营工作台）
-- 适用于电商、SaaS、内容平台等常见业务分析场景
-
-## Core Modules
-
-- 运营概览：关键 KPI、趋势图、待关注事项
-- 看板中心：模板检索、收藏、详情、预览
-- 指标分析：时间与分群维度对比
-- 数据源管理：连接信息、状态展示、连接测试入口
-- 告警中心：规则与事件记录
-- 大屏预览：保留原 schema 渲染能力，作为全屏模式
+一个可交付的商城后台项目：前端为 Vue3 管理台，后端为 Django DRF API。
 
 ## Tech Stack
 
-- Vue3 + TypeScript(strict) + Vite + pnpm
-- UI: Element Plus
-- Charts: ECharts (via vue-echarts)
-- State: Pinia
-- Validation: zod
-- CI/CD: GitHub Actions + GitHub Pages
+- Frontend: Vue3 + TypeScript + Vite + Pinia + Element Plus + ECharts
+- Backend: Django + DRF + JWT + SQLite (dev)
+- Quality: ESLint + Typecheck + Vitest + Playwright + GitHub Actions
 
-## Project Structure
+## Features (V1)
 
-```text
-src/
-  app/        # layout, route, app-level config
-  pages/      # admin pages + screen preview page
-  features/   # templates/favorites
-  renderer/   # schema render engine
-  ui/         # shared UI and chart wrappers
-  widgets/    # schema widgets
-  store/      # domain stores
-  lib/        # utils
+- 登录鉴权（JWT）
+- 运营概览（真实统计接口）
+- 分类管理（真实 API）
+- 商品管理（真实 API）
+- 订单管理（真实 API）
+- 大屏预览模式（保留）
+
+## Quick Start
+
+### 1) Backend
+
+```bash
+python3 -m venv .venv
+. .venv/bin/activate
+pip install -r backend/requirements.txt
+cd backend
+python manage.py migrate
+python manage.py bootstrap_demo
+python manage.py runserver
 ```
 
-## Run
+### 2) Frontend
 
 ```bash
 pnpm install
 pnpm dev
 ```
 
-## Quality Gates
+默认前端 API 地址：`http://127.0.0.1:8000/api`
+
+演示账号：
+
+- username: `admin`
+- password: `admin123`
+
+## Scripts
 
 ```bash
+pnpm dev
+pnpm dev:backend
+pnpm backend:migrate
+pnpm backend:seed
 pnpm lint
 pnpm typecheck
 pnpm test
@@ -62,18 +61,23 @@ pnpm test:e2e
 
 ## Main Routes
 
+- `/#/login`
 - `/#/app/overview`
-- `/#/app/dashboards`
-- `/#/app/dashboards/:schemaKey`
-- `/#/app/analysis`
-- `/#/app/datasources`
-- `/#/app/alerts`
-- `/#/app/favorites`
-- `/#/screen/:schemaKey`
+- `/#/app/categories`
+- `/#/app/products`
+- `/#/app/orders`
+- `/#/screen/demo-operations`
 
-## Docs
+## Backend API
 
-- `docs/TODO.md`
-- `docs/SCHEMA.md`
-- `docs/PERF_LOG.md`
-- `docs/USER_GUIDE.org`
+- `POST /api/auth/login`
+- `GET /api/auth/me`
+- `GET /api/dashboard/overview`
+- `GET /api/catalog/categories`
+- `GET /api/catalog/products`
+- `GET /api/orders/orders`
+
+## Notes
+
+- 你提供的“完整代码”和“后端api源码【仅供参考】”作为能力标杆，本项目已转向前后端一体的商城后台路线。
+- V1 优先打通真实交易后台主链路，营销/用户高级能力将在下一阶段扩展。
