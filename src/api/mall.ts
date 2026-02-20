@@ -54,6 +54,50 @@ export interface Order {
   items: OrderItem[]
 }
 
+export interface Customer {
+  id: number
+  nickname: string
+  phone: string
+  level: string
+  total_spent: string
+  order_count: number
+  status: 'active' | 'disabled'
+}
+
+export interface CustomerPayload {
+  nickname: string
+  phone: string
+  level: string
+  total_spent: string
+  order_count: number
+  status: Customer['status']
+}
+
+export interface Coupon {
+  id: number
+  title: string
+  code: string
+  discount_amount: string
+  min_spend: string
+  stock: number
+  claimed: number
+  status: 'draft' | 'active' | 'expired'
+  valid_from?: string
+  valid_to?: string
+}
+
+export interface CouponPayload {
+  title: string
+  code: string
+  discount_amount: string
+  min_spend: string
+  stock: number
+  claimed: number
+  status: Coupon['status']
+  valid_from?: string
+  valid_to?: string
+}
+
 export interface OverviewStats {
   product_count: number
   on_sale_count: number
@@ -112,5 +156,35 @@ export const fetchOrdersApi = async () => {
 
 export const updateOrderStatusApi = async (id: number, status: Order['status']) => {
   const { data } = await http.patch<Order>(`/orders/orders/${id}/`, { status })
+  return data
+}
+
+export const fetchCustomersApi = async () => {
+  const { data } = await http.get<Customer[]>('/common/customers')
+  return data
+}
+
+export const createCustomerApi = async (payload: CustomerPayload) => {
+  const { data } = await http.post<Customer>('/common/customers/', payload)
+  return data
+}
+
+export const updateCustomerApi = async (id: number, payload: CustomerPayload) => {
+  const { data } = await http.put<Customer>(`/common/customers/${id}/`, payload)
+  return data
+}
+
+export const fetchCouponsApi = async () => {
+  const { data } = await http.get<Coupon[]>('/common/coupons')
+  return data
+}
+
+export const createCouponApi = async (payload: CouponPayload) => {
+  const { data } = await http.post<Coupon>('/common/coupons/', payload)
+  return data
+}
+
+export const updateCouponApi = async (id: number, payload: CouponPayload) => {
+  const { data } = await http.put<Coupon>(`/common/coupons/${id}/`, payload)
   return data
 }

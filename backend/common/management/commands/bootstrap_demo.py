@@ -1,82 +1,129 @@
+from datetime import date, timedelta
 from decimal import Decimal
+import random
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
 
 from catalog.models import Category, Product
+from common.models import Coupon, Customer
 from orders.models import Order, OrderItem
 
 
 class Command(BaseCommand):
-    help = 'Create demo admin user and mall demo data.'
+    help = 'Create admin user and rich mall demo data.'
 
     def handle(self, *args, **options):
+        random.seed(42)
+
         if not User.objects.filter(username='admin').exists():
             User.objects.create_superuser(username='admin', password='admin123', email='admin@example.com')
             self.stdout.write(self.style.SUCCESS('Created admin user: admin / admin123'))
 
-        digital, _ = Category.objects.get_or_create(name='数码配件', defaults={'sort': 1})
-        apparel, _ = Category.objects.get_or_create(name='服饰箱包', defaults={'sort': 2})
+        categories = [
+            ('数码配件', 1),
+            ('服饰箱包', 2),
+            ('家居生活', 3),
+            ('运动户外', 4),
+            ('食品饮料', 5)
+        ]
 
-        p1, _ = Product.objects.get_or_create(
-            title='无线降噪耳机 Pro',
-            defaults={
-                'category': digital,
-                'price': Decimal('699.00'),
-                'stock': 120,
-                'sales': 560,
-                'status': Product.STATUS_ON_SALE
-            }
-        )
-        p2, _ = Product.objects.get_or_create(
-            title='城市通勤双肩包',
-            defaults={
-                'category': apparel,
-                'price': Decimal('259.00'),
-                'stock': 86,
-                'sales': 214,
-                'status': Product.STATUS_ON_SALE
-            }
-        )
+        category_objs = []
+        for name, sort in categories:
+            obj, _ = Category.objects.get_or_create(name=name, defaults={'sort': sort, 'is_active': True})
+            category_objs.append(obj)
 
-        o1, _ = Order.objects.get_or_create(
-            order_no='SO202602200001',
-            defaults={
-                'customer_name': '张三',
-                'customer_phone': '13800000001',
-                'status': Order.STATUS_PAID,
-                'total_amount': Decimal('958.00')
-            }
-        )
-        OrderItem.objects.get_or_create(
-            order=o1,
-            product=p1,
-            product_title=p1.title,
-            defaults={
-                'unit_price': Decimal('699.00'),
-                'quantity': 1,
-                'amount': Decimal('699.00')
-            }
-        )
+        sample_products = [
+            ('无线降噪耳机 Pro', Decimal('699.00')),
+            ('城市通勤双肩包', Decimal('259.00')),
+            ('便携咖啡杯', Decimal('89.00')),
+            ('速干运动T恤', Decimal('129.00')),
+            ('坚果礼盒装', Decimal('159.00')),
+            ('蓝牙机械键盘', Decimal('399.00')),
+            ('轻量跑鞋', Decimal('469.00')),
+            ('智能台灯', Decimal('199.00'))
+        ]
 
-        o2, _ = Order.objects.get_or_create(
-            order_no='SO202602200002',
-            defaults={
-                'customer_name': '李四',
-                'customer_phone': '13800000002',
-                'status': Order.STATUS_PENDING,
-                'total_amount': Decimal('518.00')
-            }
-        )
-        OrderItem.objects.get_or_create(
-            order=o2,
-            product=p2,
-            product_title=p2.title,
-            defaults={
-                'unit_price': Decimal('259.00'),
-                'quantity': 2,
-                'amount': Decimal('518.00')
-            }
-        )
+        products = []
+        for index, (title, price) in enumerate(sample_products):
+            category = category_objs[index % len(category_objs)]
+            product, _ = Product.objects.get_or_create(
+                title=title,
+                defaults={
+                    'category': category,
+                    'price': price,
+                    'stock': random.randint(30, 300),
+                    'sales': random.randint(30, 900),
+                    'status': Product.STATUS_ON_SALE if index % 3 != 0 else Product.STATUS_DRAFT
+                }
+            )
+            products.append(product)
 
-        self.stdout.write(self.style.SUCCESS('Demo data ready.'))
+        customers = []
+        for i in range(1, 21):
+            customer, _ = Customer.objects.get_or_create(
+                phone=f'1380000{i:04d}',
+                defaults={
+                    'nickname': f'用户{i:02d}',
+                    'level': 'VIP会员' if i % 5 == 0 else '普通会员',
+                    'total_spent': Decimal(str(random.randint(200, 12000))),
+                    'order_count': random.randint(1, 30),
+                    'status': Customer.STATUS_ACTIVE if i % 8 != 0 else Customer.STATUS_DISABLED
+                }
+            )
+            customers.append(customer)
+
+        status_pool = [Order.STATUS_PENDING, Order.STATUS_PAID, Order.STATUS_SHIPPED, Order.STATUS_COMPLETED]
+
+        for i in range(1, 31):
+            customer = customers[(i - 1) % len(customers)]
+            status = status_pool[i % len(status_pool)]
+            order_no = f'SO20260221{i:04d}'
+            order, created = Order.objects.get_or_create(
+                order_no=order_no,
+                defaults={
+                    'customer_name': customer.nickname,
+                    'customer_phone': customer.phone,
+                    'status': status,
+                    'total_amount': Decimal('0')
+                }
+            )
+
+            if created:
+                count = random.randint(1, 3)
+                selected = random.sample(products, k=count)
+                total = Decimal('0')
+
+                for product in selected:
+                    quantity = random.randint(1, 3)
+                    amount = product.price * quantity
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        product_title=product.title,
+                        unit_price=product.price,
+                        quantity=quantity,
+                        amount=amount
+                    )
+                    total += amount
+
+                order.total_amount = total
+                order.save(update_fields=['total_amount'])
+
+        today = date.today()
+        for i in range(1, 11):
+            Coupon.objects.get_or_create(
+                code=f'COUPON{i:03d}',
+                defaults={
+                    'title': f'满减券{i:03d}',
+                    'discount_amount': Decimal(str(5 * i)),
+                    'min_spend': Decimal(str(50 * i)),
+                    'stock': random.randint(100, 1000),
+                    'claimed': random.randint(20, 500),
+                    'status': Coupon.STATUS_ACTIVE if i % 3 != 0 else Coupon.STATUS_DRAFT,
+                    'valid_from': today,
+                    'valid_to': today + timedelta(days=30 + i)
+                }
+            )
+
+        self.stdout.write(self.style.SUCCESS('Rich demo data ready.'))
