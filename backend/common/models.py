@@ -52,3 +52,37 @@ class Coupon(models.Model):
 
     def __str__(self) -> str:
         return self.title
+
+
+class Notice(models.Model):
+    STATUS_DRAFT = 'draft'
+    STATUS_PUBLISHED = 'published'
+    STATUS_CHOICES = [
+        (STATUS_DRAFT, '草稿'),
+        (STATUS_PUBLISHED, '已发布')
+    ]
+
+    title = models.CharField(max_length=120)
+    content = models.TextField()
+    status = models.CharField(max_length=16, choices=STATUS_CHOICES, default=STATUS_DRAFT)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-id']
+
+    def __str__(self) -> str:
+        return self.title
+
+
+class SiteSetting(models.Model):
+    key = models.CharField(max_length=64, unique=True)
+    value = models.TextField(blank=True, default='')
+    description = models.CharField(max_length=120, blank=True, default='')
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['key']
+
+    def __str__(self) -> str:
+        return self.key

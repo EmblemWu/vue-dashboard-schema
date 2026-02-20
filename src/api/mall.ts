@@ -51,6 +51,9 @@ export interface Order {
   customer_phone: string
   status: 'pending' | 'paid' | 'shipped' | 'completed' | 'cancelled'
   total_amount: string
+  shipping_company: string
+  tracking_no: string
+  shipped_at: string | null
   items: OrderItem[]
 }
 
@@ -96,6 +99,32 @@ export interface CouponPayload {
   status: Coupon['status']
   valid_from?: string
   valid_to?: string
+}
+
+export interface Notice {
+  id: number
+  title: string
+  content: string
+  status: 'draft' | 'published'
+}
+
+export interface NoticePayload {
+  title: string
+  content: string
+  status: Notice['status']
+}
+
+export interface SiteSetting {
+  id: number
+  key: string
+  value: string
+  description: string
+}
+
+export interface SiteSettingPayload {
+  key: string
+  value: string
+  description: string
 }
 
 export interface OverviewStats {
@@ -154,8 +183,8 @@ export const fetchOrdersApi = async () => {
   return data
 }
 
-export const updateOrderStatusApi = async (id: number, status: Order['status']) => {
-  const { data } = await http.patch<Order>(`/orders/orders/${id}/`, { status })
+export const updateOrderStatusApi = async (id: number, payload: Partial<Order>) => {
+  const { data } = await http.patch<Order>(`/orders/orders/${id}/`, payload)
   return data
 }
 
@@ -186,5 +215,30 @@ export const createCouponApi = async (payload: CouponPayload) => {
 
 export const updateCouponApi = async (id: number, payload: CouponPayload) => {
   const { data } = await http.put<Coupon>(`/common/coupons/${id}/`, payload)
+  return data
+}
+
+export const fetchNoticesApi = async () => {
+  const { data } = await http.get<Notice[]>('/common/notices')
+  return data
+}
+
+export const createNoticeApi = async (payload: NoticePayload) => {
+  const { data } = await http.post<Notice>('/common/notices/', payload)
+  return data
+}
+
+export const updateNoticeApi = async (id: number, payload: NoticePayload) => {
+  const { data } = await http.put<Notice>(`/common/notices/${id}/`, payload)
+  return data
+}
+
+export const fetchSettingsApi = async () => {
+  const { data } = await http.get<SiteSetting[]>('/common/settings')
+  return data
+}
+
+export const updateSettingApi = async (id: number, payload: SiteSettingPayload) => {
+  const { data } = await http.put<SiteSetting>(`/common/settings/${id}/`, payload)
   return data
 }

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from common.models import Coupon, Customer
+from common.models import Coupon, Customer, Notice, SiteSetting
 
 
 class CustomerSerializer(serializers.ModelSerializer):
@@ -36,3 +36,15 @@ class CouponSerializer(serializers.ModelSerializer):
             'created_at',
             'updated_at'
         ]
+
+
+class NoticeSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Notice
+        fields = ['id', 'title', 'content', 'status', 'created_at', 'updated_at']
+
+
+class SiteSettingSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = SiteSetting
+        fields = ['id', 'key', 'value', 'description', 'updated_at']

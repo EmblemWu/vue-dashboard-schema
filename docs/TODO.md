@@ -42,3 +42,13 @@
 - [x] 用户管理页面接入真实 API（搜索 + 新建 + 编辑 + 启停）
 - [x] 营销管理页面接入真实 API（搜索 + 新建 + 编辑 + 状态切换）
 - [x] e2e 增强：覆盖 users/coupons 页面链路
+
+## Milestone F - Deeper Backoffice Features
+
+- [x] 订单域增强：发货信息字段（物流公司/单号/发货时间）
+- [x] 订单页面增强：详情抽屉 + 发货流程弹窗
+- [x] 新增公告域（Notice）后端模型与 API
+- [x] 新增系统设置域（SiteSetting）后端模型与 API
+- [x] 公告管理页面接入真实 API（搜索 + 新建 + 编辑 + 发布/下线）
+- [x] 系统设置页面接入真实 API（在线修改保存）
+- [x] e2e 覆盖 notices/settings 页面链路

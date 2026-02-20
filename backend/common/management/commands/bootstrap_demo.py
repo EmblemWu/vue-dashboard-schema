@@ -4,9 +4,10 @@ import random
 
 from django.contrib.auth.models import User
 from django.core.management.base import BaseCommand
+from django.utils import timezone
 
 from catalog.models import Category, Product
-from common.models import Coupon, Customer
+from common.models import Coupon, Customer, Notice, SiteSetting
 from orders.models import Order, OrderItem
 
 
@@ -85,7 +86,10 @@ class Command(BaseCommand):
                     'customer_name': customer.nickname,
                     'customer_phone': customer.phone,
                     'status': status,
-                    'total_amount': Decimal('0')
+                    'total_amount': Decimal('0'),
+                    'shipping_company': '顺丰速运' if status in [Order.STATUS_SHIPPED, Order.STATUS_COMPLETED] else '',
+                    'tracking_no': f'SF{random.randint(100000000, 999999999)}' if status in [Order.STATUS_SHIPPED, Order.STATUS_COMPLETED] else '',
+                    'shipped_at': timezone.now() if status in [Order.STATUS_SHIPPED, Order.STATUS_COMPLETED] else None
                 }
             )
 
@@ -125,5 +129,24 @@ class Command(BaseCommand):
                     'valid_to': today + timedelta(days=30 + i)
                 }
             )
+
+        notices = [
+            ('系统维护通知', '本周六凌晨将进行系统维护，预计30分钟。', Notice.STATUS_PUBLISHED),
+            ('春节营销活动', '春节满减活动已上线，请及时配置首页资源位。', Notice.STATUS_PUBLISHED),
+            ('仓储提醒', '华东仓库存偏低，请补货。', Notice.STATUS_DRAFT)
+        ]
+
+        for title, content, status in notices:
+            Notice.objects.get_or_create(title=title, defaults={'content': content, 'status': status})
+
+        setting_items = [
+            ('site_name', 'Mall Admin', '站点名称'),
+            ('service_phone', '400-800-1234', '客服电话'),
+            ('default_express', '顺丰速运', '默认物流公司'),
+            ('order_auto_cancel_minutes', '30', '未支付订单自动取消分钟数')
+        ]
+
+        for key, value, description in setting_items:
+            SiteSetting.objects.get_or_create(key=key, defaults={'value': value, 'description': description})
 
         self.stdout.write(self.style.SUCCESS('Rich demo data ready.'))

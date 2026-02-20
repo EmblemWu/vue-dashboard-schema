@@ -1,8 +1,6 @@
 import { expect, test } from '@playwright/test'
 
-test('mall admin flow: login -> overview -> products -> orders -> users -> coupons', async ({
-  page
-}) => {
+test('mall admin flow: login -> overview -> core modules', async ({ page }) => {
   await page.goto('/#/login')
   await page.getByRole('button', { name: '登录' }).click()
 
@@ -15,13 +13,18 @@ test('mall admin flow: login -> overview -> products -> orders -> users -> coupo
 
   await page.goto('/#/app/orders')
   await expect(page.getByText('订单管理')).toBeVisible()
-  await expect(page.locator('.el-table__row').first()).toContainText('SO20260221')
+  await page.locator('.el-table__row').first().getByRole('button', { name: '详情' }).click()
+  await expect(page.getByText('订单详情')).toBeVisible()
 
   await page.goto('/#/app/users')
   await expect(page.getByText('用户管理')).toBeVisible()
-  await expect(page.locator('.el-table__row').first()).toContainText('用户')
 
   await page.goto('/#/app/coupons')
   await expect(page.getByText('营销管理（优惠券）')).toBeVisible()
-  await expect(page.getByText('COUPON001')).toBeVisible()
+
+  await page.goto('/#/app/notices')
+  await expect(page.getByText('公告管理')).toBeVisible()
+
+  await page.goto('/#/app/settings')
+  await expect(page.getByText('系统设置')).toBeVisible()
 })

@@ -21,6 +21,9 @@ class OrderSerializer(serializers.ModelSerializer):
             'customer_phone',
             'status',
             'total_amount',
+            'shipping_company',
+            'tracking_no',
+            'shipped_at',
             'created_at',
             'updated_at',
             'items'
