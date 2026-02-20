@@ -19,39 +19,56 @@ export const routes: RouteRecordRaw[] = [
       {
         path: 'overview',
         name: 'overview',
-        component: () => import('@/pages/admin/OverviewPage.vue')
+        component: () => import('@/pages/admin/OverviewPage.vue'),
+        meta: { permission: 'overview.read' }
       },
       {
         path: 'categories',
         name: 'categories',
-        component: () => import('@/pages/admin/CategoriesPage.vue')
+        component: () => import('@/pages/admin/CategoriesPage.vue'),
+        meta: { permission: 'categories.read' }
       },
       {
         path: 'products',
         name: 'products',
-        component: () => import('@/pages/admin/ProductsPage.vue')
+        component: () => import('@/pages/admin/ProductsPage.vue'),
+        meta: { permission: 'products.read' }
       },
-      { path: 'orders', name: 'orders', component: () => import('@/pages/admin/OrdersPage.vue') },
-      { path: 'users', name: 'users', component: () => import('@/pages/admin/UsersPage.vue') },
+      {
+        path: 'orders',
+        name: 'orders',
+        component: () => import('@/pages/admin/OrdersPage.vue'),
+        meta: { permission: 'orders.read' }
+      },
+      {
+        path: 'users',
+        name: 'users',
+        component: () => import('@/pages/admin/UsersPage.vue'),
+        meta: { permission: 'users.read' }
+      },
       {
         path: 'managers',
         name: 'managers',
-        component: () => import('@/pages/admin/ManagersPage.vue')
+        component: () => import('@/pages/admin/ManagersPage.vue'),
+        meta: { permission: 'managers.read' }
       },
       {
         path: 'coupons',
         name: 'coupons',
-        component: () => import('@/pages/admin/CouponsPage.vue')
+        component: () => import('@/pages/admin/CouponsPage.vue'),
+        meta: { permission: 'coupons.read' }
       },
       {
         path: 'notices',
         name: 'notices',
-        component: () => import('@/pages/admin/NoticesPage.vue')
+        component: () => import('@/pages/admin/NoticesPage.vue'),
+        meta: { permission: 'notices.read' }
       },
       {
         path: 'settings',
         name: 'settings',
-        component: () => import('@/pages/admin/SettingsPage.vue')
+        component: () => import('@/pages/admin/SettingsPage.vue'),
+        meta: { permission: 'settings.read' }
       }
     ]
   },

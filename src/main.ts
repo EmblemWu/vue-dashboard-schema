@@ -31,6 +31,11 @@ router.beforeEach(async (to) => {
     return '/app/overview'
   }
 
+  const permission = to.meta.permission as string | undefined
+  if (requiresAuth && permission && !auth.can(permission)) {
+    return '/app/overview'
+  }
+
   return true
 })
 

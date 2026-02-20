@@ -3,7 +3,7 @@
     <el-aside width="220px" class="app-shell__aside">
       <div class="brand">Insight Admin</div>
       <el-menu :default-active="activePath" router class="app-shell__menu">
-        <el-menu-item v-for="item in NAV_ITEMS" :key="item.path" :index="item.path">
+        <el-menu-item v-for="item in visibleNavItems" :key="item.path" :index="item.path">
           <el-icon><component :is="item.icon" /></el-icon>
           <span>{{ item.label }}</span>
         </el-menu-item>
@@ -48,7 +48,8 @@ const activePath = computed(() => {
   return route.path
 })
 
-const current = computed(() => NAV_ITEMS.find((item) => item.path === activePath.value))
+const visibleNavItems = computed(() => NAV_ITEMS.filter((item) => auth.can(item.permission)))
+const current = computed(() => visibleNavItems.value.find((item) => item.path === activePath.value))
 const title = computed(() => current.value?.label ?? 'Insight Admin')
 const subtitle = computed(() => '商城运营后台')
 const initials = computed(() => (auth.user?.username?.slice(0, 2) ?? 'GU').toUpperCase())

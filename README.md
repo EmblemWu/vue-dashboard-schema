@@ -11,6 +11,7 @@
 ## Features (V1)
 
 - 登录鉴权（JWT）
+- 角色权限（RBAC，菜单/路由/按钮级）
 - 运营概览（真实统计接口）
 - 分类管理（真实 API）
 - 商品管理（真实 API）
@@ -82,6 +83,7 @@ pnpm test:e2e
 
 - `POST /api/auth/login`
 - `GET /api/auth/me`
+- `GET /api/auth/permissions`
 - `GET /api/auth/managers/`
 - `GET /api/dashboard/overview`
 - `GET /api/catalog/categories`
@@ -96,3 +98,4 @@ pnpm test:e2e
 
 - 你提供的“完整代码”和“后端api源码【仅供参考】”作为能力标杆，本项目已转向前后端一体的商城后台路线。
 - 当前版本已补齐用户/营销/公告/设置等核心后台域，并持续对照参考项目增强操作深度。
+- 权限模型：`superuser` 拥有全部权限，`staff` 可读管理员列表但不能新增/编辑/重置密码。

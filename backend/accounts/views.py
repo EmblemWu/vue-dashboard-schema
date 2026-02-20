@@ -6,7 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.views import TokenObtainPairView
 
+from accounts.permissions import IsSuperUser
 from accounts.serializers import ManagerSerializer, UserSerializer
+from accounts.services import build_permission_codes
 
 
 class LoginView(TokenObtainPairView):
@@ -21,12 +23,23 @@ class MeView(APIView):
         return Response(data)
 
 
+class PermissionsView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'permissions': build_permission_codes(request.user)})
+
+
 class ManagerViewSet(viewsets.ModelViewSet):
-    permission_classes = [IsAdminUser]
     serializer_class = ManagerSerializer
 
     def get_queryset(self):
         return User.objects.filter(is_staff=True).order_by('-id')
+
+    def get_permissions(self):
+        if self.action in ['list', 'retrieve']:
+            return [IsAdminUser()]
+        return [IsSuperUser()]
 
     @action(detail=True, methods=['post'])
     def reset_password(self, request, pk=None):

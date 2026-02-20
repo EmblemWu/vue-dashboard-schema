@@ -1,10 +1,11 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
-import { loginApi, meApi, type CurrentUser } from '@/api/auth'
+import { loginApi, meApi, permissionsApi, type CurrentUser } from '@/api/auth'
 import { tokenStorage } from '@/lib/http'
 
 export const useAuthStore = defineStore('auth', () => {
   const user = ref<CurrentUser | null>(null)
+  const permissions = ref<string[]>([])
   const ready = ref(false)
 
   const isAuthed = () => !!tokenStorage.get()
@@ -13,6 +14,7 @@ export const useAuthStore = defineStore('auth', () => {
     const data = await loginApi(username, password)
     tokenStorage.set(data.access)
     user.value = await meApi()
+    permissions.value = await permissionsApi()
   }
 
   const bootstrap = async () => {
@@ -23,9 +25,11 @@ export const useAuthStore = defineStore('auth', () => {
 
     try {
       user.value = await meApi()
+      permissions.value = await permissionsApi()
     } catch {
       tokenStorage.clear()
       user.value = null
+      permissions.value = []
     } finally {
       ready.value = true
     }
@@ -34,7 +38,15 @@ export const useAuthStore = defineStore('auth', () => {
   const logout = () => {
     tokenStorage.clear()
     user.value = null
+    permissions.value = []
   }
 
-  return { user, ready, isAuthed, login, bootstrap, logout }
+  const can = (code?: string) => {
+    if (!code) {
+      return true
+    }
+    return permissions.value.includes(code)
+  }
+
+  return { user, permissions, ready, isAuthed, login, bootstrap, logout, can }
 })

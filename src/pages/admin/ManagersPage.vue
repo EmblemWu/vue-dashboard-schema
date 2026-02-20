@@ -11,7 +11,7 @@
             style="width: 260px"
           />
           <el-button @click="load">刷新</el-button>
-          <el-button type="primary" @click="openCreate">新建管理员</el-button>
+          <el-button v-if="canWrite" type="primary" @click="openCreate">新建管理员</el-button>
         </el-space>
       </div>
     </template>
@@ -41,7 +41,7 @@
       </el-table-column>
       <el-table-column label="操作" width="280" fixed="right">
         <template #default="scope">
-          <el-space>
+          <el-space v-if="canWrite">
             <el-button size="small" @click="openEdit(scope.row)">编辑</el-button>
             <el-button size="small" @click="toggleStatus(scope.row)">
               {{ scope.row.is_active ? '停用' : '启用' }}
@@ -93,6 +93,7 @@ import {
   type Manager,
   type ManagerPayload
 } from '@/api/mall'
+import { useAuthStore } from '@/store/auth'
 
 const rows = ref<Manager[]>([])
 const loading = ref(false)
@@ -101,6 +102,8 @@ const keyword = ref('')
 const dialogVisible = ref(false)
 const isEdit = ref(false)
 const editingId = ref<number | null>(null)
+const auth = useAuthStore()
+const canWrite = computed(() => auth.can('managers.write'))
 
 const form = reactive<ManagerPayload>({
   username: '',
