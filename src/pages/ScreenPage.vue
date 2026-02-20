@@ -118,9 +118,20 @@ onUnmounted(() => {
 
 <style scoped>
 .screen-page {
+  --bg-base: #08111f;
+  --bg-panel: #11243f;
+  --bg-panel-soft: rgba(14, 35, 61, 0.72);
+  --text-main: #e7f1ff;
+  --text-muted: #95aac8;
+  --accent: #39c5bb;
+  --danger: #ff6c70;
+  --warning: #ffc857;
+  --border: rgba(102, 163, 245, 0.25);
   height: 100%;
   display: flex;
   flex-direction: column;
+  color: var(--text-main);
+  background: radial-gradient(circle at 20% 20%, #133156 0, var(--bg-base) 40%) fixed;
 }
 
 .screen-page__viewport {

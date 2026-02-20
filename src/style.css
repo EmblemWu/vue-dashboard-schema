@@ -1,13 +1,13 @@
 :root {
-  --bg-base: #08111f;
-  --bg-panel: #11243f;
-  --bg-panel-soft: rgba(14, 35, 61, 0.72);
-  --text-main: #e7f1ff;
-  --text-muted: #95aac8;
-  --accent: #39c5bb;
-  --danger: #ff6c70;
-  --warning: #ffc857;
-  --border: rgba(102, 163, 245, 0.25);
+  --bg-base: #f4f6f8;
+  --bg-panel: #ffffff;
+  --bg-panel-soft: #f8fafc;
+  --text-main: #1f2a37;
+  --text-muted: #6b7280;
+  --accent: #2563eb;
+  --danger: #dc2626;
+  --warning: #d97706;
+  --border: #e5e7eb;
 }
 
 * {
@@ -22,7 +22,7 @@ body,
   height: 100%;
   font-family: 'Avenir Next', 'PingFang SC', 'Microsoft YaHei', sans-serif;
   color: var(--text-main);
-  background: radial-gradient(circle at 20% 20%, #133156 0, var(--bg-base) 40%) fixed;
+  background: var(--bg-base);
 }
 
 button,

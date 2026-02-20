@@ -1,22 +1,25 @@
-#+TITLE: Schema Dashboard User Guide
+#+TITLE: Insight Admin User Guide
 
-* 页面说明
-- /#/templates: 模板列表（可收藏、可进入详情/大屏）
-- /#/templates/:schemaKey: 模板详情（查看组件清单）
-- /#/favorites: 收藏管理
-- /#/screen/:schemaKey: 大屏渲染页
+* 入口
+- /#/app/overview: 运营概览
+- /#/app/dashboards: 看板中心
+- /#/app/analysis: 指标分析
+- /#/app/datasources: 数据源管理
+- /#/app/alerts: 告警中心
+- /#/app/favorites: 我的收藏
+- /#/screen/:schemaKey: 全屏看板预览
 
-* 两条可跑通路径
-1. 模板列表 -> 模板详情 -> 打开大屏
-2. 模板列表收藏 -> 收藏管理 -> 打开大屏
+* 关键路径
+1. 看板中心 -> 详情 -> 打开预览
+2. 看板中心收藏 -> 我的收藏 -> 打开预览
 
-* 本地运行
+* 运行
 #+begin_src bash
 pnpm install
 pnpm dev
 #+end_src
 
-* 质量门
+* 验收
 #+begin_src bash
 pnpm lint
 pnpm typecheck
@@ -24,13 +27,3 @@ pnpm test
 pnpm build
 pnpm test:e2e
 #+end_src
-
-* 新增模板
-1. 在 =schemas/= 添加 JSON 文件
-2. 按 =docs/SCHEMA.md= 定义字段
-3. 在模板列表查看是否加载成功
-
-* 异常与兜底
-- 页面级：加载态/空态/错误态/重试
-- 全局：ErrorBoundary 捕获运行时异常
-- 图表资源失败时降级显示提示文案

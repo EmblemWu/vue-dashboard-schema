@@ -1,37 +1,38 @@
-# Resume-grade Delivery TODO
+# TODO (Insight Admin Upgrade)
 
-## Milestone 1 - 产品路径闭环
+## M1 - Repositioning & IA
 
-- [x] 新增模板列表页 `/templates`
-- [x] 新增模板详情页 `/templates/:schemaKey`
-- [x] 新增收藏管理页 `/favorites`
-- [x] 大屏页改为 `/screen/:schemaKey`
-- [x] 路由 404 页面
-- [x] 用户路径 A：列表 -> 详情 -> 大屏
-- [x] 用户路径 B：列表收藏 -> 收藏管理 -> 大屏
+- [x] 项目定位从单页大屏升级为通用业务分析后台
+- [x] 后台信息架构：概览/看板中心/分析/数据源/告警/收藏
+- [x] 路由改造为 `/app/*` 主干 + `/screen/:schemaKey` 预览模式
 
-## Milestone 2 - 状态与异常闭环
+## M2 - UI Framework Upgrade
 
-- [x] 列表页支持加载/空/错误/重试
-- [x] 详情页支持加载/空/错误/重试
-- [x] 大屏页支持加载/错误/重试
-- [x] 全局 ErrorBoundary
-- [x] 资源加载失败兜底（图表失败降级文案）
+- [x] 接入 Element Plus
+- [x] 实现后台壳子（侧栏 + 顶栏）
+- [x] 建立统一后台视觉基线（light admin）
 
-## Milestone 3 - 工程质量闭环
+## M3 - Core Pages Delivery
 
-- [x] `pnpm lint` 通过
-- [x] `pnpm typecheck` 通过
-- [x] `pnpm test` 通过
-- [x] `pnpm build` 通过
-- [x] Playwright e2e 关键路径覆盖
-- [x] CI 集成 e2e
+- [x] 运营概览页面
+- [x] 看板中心页面（搜索 + 收藏 + 详情 + 预览）
+- [x] 模板详情页面
+- [x] 指标分析页面
+- [x] 数据源管理页面
+- [x] 告警中心页面
+- [x] 收藏管理页面
 
-## Milestone 4 - 性能与文档闭环
+## M4 - Existing Engine Integration
 
-- [x] PERF_LOG 提供 baseline
-- [x] PERF_LOG 提供 2 次优化对比
-- [x] PERF_LOG 提供可复现步骤
-- [x] README 完整化（定位/功能/架构/取舍/限制/运行部署）
-- [x] README 提供线上 demo 链接
-- [x] 目录分层体现 `app/pages/features/ui/lib`
+- [x] 复用原 schema renderer 能力到预览页
+- [x] 保留刷新调度与数据源兜底能力
+- [x] 兼容旧入口重定向
+
+## M5 - Quality & Verification
+
+- [x] `pnpm lint`
+- [x] `pnpm typecheck`
+- [x] `pnpm test`
+- [x] `pnpm build`
+- [x] `pnpm test:e2e`
+- [x] CI 通过并推送

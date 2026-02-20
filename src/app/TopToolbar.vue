@@ -6,8 +6,8 @@
     </div>
 
     <div class="top-toolbar__actions">
-      <RouterLink to="/templates">模板列表</RouterLink>
-      <RouterLink to="/favorites">收藏管理</RouterLink>
+      <RouterLink to="/app/dashboards">模板列表</RouterLink>
+      <RouterLink to="/app/favorites">收藏管理</RouterLink>
       <label>
         模板
         <select
